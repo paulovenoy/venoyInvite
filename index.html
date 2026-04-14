@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Piquenique de 20 Anos da Thainá</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400&family=Poppins:wght@300;400;600&display=swap');
+
+        :root {
+            --purple-dark: #2B0D46;
+            --purple-mid: #5E2C85;
+            --purple-light: #9B66C5;
+            --purple-bg: #F4EAFB;
+            --text-color: #2c3e50;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--purple-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        h1, h2, h3 { font-family: 'Lora', serif; color: var(--purple-dark); }
+
+        header {
+            background: linear-gradient(135deg, var(--purple-dark) 0%, var(--purple-mid) 100%);
+            color: white;
+            text-align: center;
+            padding: 4rem 1rem;
+            border-bottom: 5px solid var(--purple-light);
+        }
+
+        header h1 { font-size: 3rem; margin-bottom: 10px; }
+        header p { font-size: 1.2rem; font-weight: 300; }
+        .bougainville { font-size: 2rem; margin: 10px; }
+
+        .container { max-width: 800px; margin: 0 auto; padding: 2rem; }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 20px rgba(94, 44, 133, 0.1);
+            border-left: 5px solid var(--purple-mid);
+        }
+
+        .card h2 { font-size: 1.8rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 10px; }
+
+        /* Mapa do Google */
+        .map-container {
+            width: 100%;
+            height: 300px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 1rem;
+            border: 2px solid var(--purple-bg);
+        }
+
+        .map-container iframe { width: 100%; height: 100%; border: none; }
+
+        .quote {
+            text-align: center; font-style: italic; font-family: 'Lora', serif;
+            font-size: 1.3rem; color: var(--purple-mid); margin: 2rem 0; padding: 1rem;
+            border-top: 1px solid var(--purple-light); border-bottom: 1px solid var(--purple-light);
+        }
+
+        .btn {
+            display: block; width: 100%; max-width: 350px; margin: 2rem auto;
+            background-color: var(--purple-mid); color: white; text-align: center;
+            padding: 15px 20px; font-size: 1.2rem; font-weight: bold;
+            border-radius: 30px; border: none; cursor: pointer; transition: background 0.3s;
+        }
+
+        .btn:hover { background-color: var(--purple-dark); }
+
+        /* Lista de Convidados */
+        .guests-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 15px;
+            margin-top: 1.5rem;
+            text-align: center;
+        }
+
+        .guest-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .guest-item img {
+            width: 60px; height: 60px; border-radius: 50%;
+            object-fit: cover; border: 3px solid var(--purple-light);
+            margin-bottom: 5px;
+        }
+
+        footer { text-align: center; padding: 2rem; background-color: var(--purple-dark); color: white; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div>
+            <span class="bougainville">🌺</span><span class="bougainville">🌿</span><span class="bougainville">🌺</span>
+        </div>
+        <h1>Meus 20 Anos!</h1>
+        <p>Um piquenique especial entre as florestas de Forks e as Highlands da Escócia.</p>
+    </header>
+
+    <div class="container">
+        
+        <div class="card">
+            <h2>📅 O DNA da Festa 🧬</h2>
+            <p>Nossa biologia nos diz que precisamos de sol, ar livre e boas companhias! Venha celebrar a vida comigo.</p>
+            <br>
+            <p><strong>Data:</strong> 10 de maio de 2026</p>
+            <p><strong>Hora:</strong> 08:00h AM</p>
+            
+            <p><strong>Local:</strong> Campo São Bento</p>
+            <div class="map-container">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3675.250285413534!2d-43.11006922468982!3d-22.904137479256963!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9983e5b915f82f%3A0xc76077822d86d7fe!2sCampo%20de%20S%C3%A3o%20Bento!5e0!3m2!1spt-BR!2sbr!4v1776132085863!5m2!1spt-BR!2sbr" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+        </div>
+
+        <div class="quote">
+            "Sina de cigarra / Djavanear o que há de bom..." 🎵<br>
+            <span style="font-size: 1rem;">- Sina, Djavan</span>
+        </div>
+
+        <div class="card">
+            <h2>🎉 O Grande Bingo da Aniversariante!</h2>
+            <p>Durante o piquenique teremos um bingo divertido sobre mim! Quem prestar atenção e gabaritar a cartela leva um prêmio especial.</p>
+        </div>
+
+        <div class="card">
+            <h2>☕ O Banquete</h2>
+            <p>O cardápio principal da tarde será a dupla imbatível:</p>
+            <div style="text-align: center; margin-top: 1rem;">
+                <p><strong>🍪 Cavaca Crocante + ☕ Café Fresquinho</strong></p>
+            </div>
+        </div>
+
+        <div class="card" id="rsvp-section">
+            <h2>✅ Quem vai?</h2>
+            <p>Faça login com sua conta do Google para confirmar sua presença no piquenique!</p>
+            
+            <button id="login-btn" class="btn">Confirmar com o Google</button>
+            
+            <div id="guests-list" class="guests-grid">
+                </div>
+        </div>
+
+    </div>
+
+    <footer>
+        <p>Com a benção de São Francisco de Assis, feito com amor, biologia e música para comemorar 20 anos incríveis.</p>
+    </footer>
+
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyADD1-3nW7YDKrgX2gDxI-IZliSQ0nKDhI",
+  authDomain: "aniversario20y.firebaseapp.com",
+  projectId: "aniversario20y",
+  storageBucket: "aniversario20y.firebasestorage.app",
+  messagingSenderId: "657674628493",
+  appId: "1:657674628493:web:2a3cb489d2fd933543e1c4"
+};
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+
+    const loginBtn = document.getElementById('login-btn');
+    const guestsList = document.getElementById('guests-list');
+
+    loginBtn.addEventListener('click', async () => {
+        try {
+            const result = await signInWithPopup(auth, provider);
+            const user = result.user;
+            console.log("Usuário logado:", user.displayName);
+
+            const q = query(collection(db, "convidados"), where("uid", "==", user.uid));
+            const querySnapshot = await getDocs(q);
+            
+            if(querySnapshot.empty) {
+                await addDoc(collection(db, "convidados"), {
+                    uid: user.uid,
+                    nome: user.displayName,
+                    foto: user.photoURL,
+                    timestamp: new Date()
+                });
+                console.log("Dados salvos no Firestore!");
+            } else {
+                console.log("Usuário já estava na lista.");
+            }
+            
+            loginBtn.innerText = "Presença Confirmada! 🎉";
+            loginBtn.disabled = true;
+
+        } catch (error) {
+            console.error("Erro completo:", error);
+            alert("Erro ao salvar no banco: " + error.message);
+        }
+    });
+
+    // Esta função roda sozinha e atualiza a lista sempre que o site abre ou o banco muda
+    onSnapshot(collection(db, "convidados"), (snapshot) => {
+        console.log("Lendo lista de convidados...");
+        guestsList.innerHTML = ''; 
+        snapshot.forEach((doc) => {
+            const convidado = doc.data();
+            const primeiroNome = convidado.nome.split(' ')[0]; 
+            
+            guestsList.innerHTML += `
+                <div class="guest-item">
+                    <img src="${convidado.foto}" alt="${primeiroNome}" referrerpolicy="no-referrer">
+                    <span>${primeiroNome}</span>
+                </div>
+            `;
+        });
+    }, (error) => {
+        console.error("Erro na leitura em tempo real:", error);
+    });
+</script>
+
+</body>
+</html>
