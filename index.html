@@ -59,6 +59,11 @@
             overflow: hidden;
             margin-top: 1rem;
             border: 2px solid var(--purple-bg);
+            background-color: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
         }
 
         .map-container iframe { width: 100%; height: 100%; border: none; }
@@ -87,19 +92,8 @@
             text-align: center;
         }
 
-        .guest-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .guest-item img {
-            width: 60px; height: 60px; border-radius: 50%;
-            object-fit: cover; border: 3px solid var(--purple-light);
-            margin-bottom: 5px;
-        }
+        .guest-item { display: flex; flex-direction: column; align-items: center; font-size: 0.8rem; font-weight: 600; }
+        .guest-item img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 3px solid var(--purple-light); margin-bottom: 5px; }
 
         /* Seção O que levar */
         .input-group { display: flex; gap: 10px; margin-bottom: 1rem; flex-wrap: wrap; }
@@ -133,12 +127,12 @@
             <h2>📅 O DNA da Festa 🧬</h2>
             <p>Nossa biologia nos diz que precisamos de sol, ar livre e boas companhias! Venha celebrar a vida comigo.</p>
             <br>
-            <p><strong>Data:</strong> 10 de maio de 2026</p>
-            <p><strong>Hora:</strong> 08:00h AM</p>
+            <p><strong>Data:</strong> <span id="site-data">Carregando...</span></p>
+            <p><strong>Hora:</strong> <span id="site-hora">Carregando...</span></p>
+            <p><strong>Local:</strong> <span id="site-local">Carregando...</span></p>
             
-            <p><strong>Local:</strong> Campo São Bento</p>
-            <div class="map-container">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3675.250285413534!2d-43.11006922468982!3d-22.904137479256963!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9983e5b915f82f%3A0xc76077822d86d7fe!2sCampo%20de%20S%C3%A3o%20Bento!5e0!3m2!1spt-BR!2sbr!4v1776132085863!5m2!1spt-BR!2sbr" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            <div class="map-container" id="site-map">
+                Carregando mapa...
             </div>
         </div>
 
@@ -148,31 +142,28 @@
         </div>
 
         <div class="card">
-            <h2>🎉 O Grande Bingo da Aniversariante!</h2>
-            <p>Durante o piquenique teremos um bingo divertido sobre mim! Quem prestar atenção e gabaritar a cartela leva um prêmio especial.</p>
+            <h2>☕ O Banquete</h2>
+            <p>O cardápio principal da tarde será a dupla imbatível:</p>
+            <div style="text-align: center; margin-top: 1rem;">
+                <p><strong>🍪 Cavaca Crocante + ☕ Café Fresquinho</strong></p>
+            </div>
         </div>
 
         <div class="card" id="rsvp-section">
             <h2>✅ Quem vai?</h2>
             <p>Faça login com sua conta do Google para confirmar sua presença no piquenique!</p>
-            
             <button id="login-btn" class="btn">Confirmar com o Google</button>
-            
             <div id="guests-list" class="guests-grid"></div>
         </div>
 
         <div class="card">
             <h2>🧺 O que você vai levar?</h2>
-            <p>Para o nosso banquete ficar ainda mais gostoso (além da tradicional cavaca com café ☕), coloque aqui o que você pretende levar para compartilharmos!</p>
-            <p style="font-size: 0.8rem; color: #666; margin-bottom: 1rem;">*Faça login na seção acima primeiro para adicionar itens no seu nome.</p>
-            
+            <p>Para o nosso banquete ficar ainda mais gostoso, coloque aqui o que você pretende levar para compartilharmos!</p>
             <div class="input-group">
                 <input type="text" id="item-input" placeholder="Ex: Bolo de cenoura, Suco, Pão de queijo...">
                 <button id="add-item-btn" class="btn-small">Adicionar à mesa</button>
             </div>
-            
-            <ul id="items-list" class="items-list">
-                </ul>
+            <ul id="items-list" class="items-list"></ul>
         </div>
 
         <div class="card">
@@ -197,7 +188,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, where, getDocs, orderBy, doc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyADD1-3nW7YDKrgX2gDxI-IZliSQ0nKDhI",
@@ -213,6 +204,23 @@
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
 
+        // 1. CARREGAR CONFIGURAÇÕES DO SITE (Editadas no Admin)
+        const configRef = doc(db, "configuracoes", "geral");
+        onSnapshot(configRef, (docSnap) => {
+            if (docSnap.exists()) {
+                const config = docSnap.data();
+                document.getElementById('site-data').innerText = config.data || "A definir";
+                document.getElementById('site-hora').innerText = config.hora || "A definir";
+                document.getElementById('site-local').innerText = config.local || "A definir";
+                
+                if (config.mapa_url) {
+                    document.getElementById('site-map').innerHTML = `<iframe src="${config.mapa_url}" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`;
+                } else {
+                    document.getElementById('site-map').innerHTML = "Mapa não configurado.";
+                }
+            }
+        });
+
         const loginBtn = document.getElementById('login-btn');
         const guestsList = document.getElementById('guests-list');
         const itemInput = document.getElementById('item-input');
@@ -224,88 +232,61 @@
             try {
                 const result = await signInWithPopup(auth, provider);
                 const user = result.user;
-                console.log("Usuário logado:", user.displayName);
 
                 const q = query(collection(db, "convidados"), where("uid", "==", user.uid));
                 const querySnapshot = await getDocs(q);
                 
                 if(querySnapshot.empty) {
                     await addDoc(collection(db, "convidados"), {
-                        uid: user.uid,
-                        nome: user.displayName,
-                        foto: user.photoURL,
-                        timestamp: new Date()
+                        uid: user.uid, nome: user.displayName, foto: user.photoURL, timestamp: new Date()
                     });
-                    console.log("Dados salvos no Firestore!");
                 }
                 
                 loginBtn.innerText = "Presença Confirmada! 🎉";
                 loginBtn.disabled = true;
 
             } catch (error) {
-                console.error("Erro completo:", error);
                 alert("Erro ao salvar no banco: " + error.message);
             }
         });
 
-        // LER LISTA DE CONVIDADOS EM TEMPO REAL
+        // LER LISTA DE CONVIDADOS
         onSnapshot(collection(db, "convidados"), (snapshot) => {
             guestsList.innerHTML = ''; 
             snapshot.forEach((doc) => {
                 const convidado = doc.data();
                 const primeiroNome = convidado.nome.split(' ')[0]; 
-                
                 guestsList.innerHTML += `
                     <div class="guest-item">
                         <img src="${convidado.foto}" alt="${primeiroNome}" referrerpolicy="no-referrer">
                         <span>${primeiroNome}</span>
-                    </div>
-                `;
+                    </div>`;
             });
         });
 
-        // LÓGICA PARA ADICIONAR ITEM DO PIQUENIQUE
+        // LÓGICA DE ITENS
         addItemBtn.addEventListener('click', async () => {
-            const user = auth.currentUser; // Verifica se logou
+            const user = auth.currentUser;
             const itemValue = itemInput.value.trim();
 
-            if (!user) {
-                alert("Por favor, clique em 'Confirmar com o Google' na seção acima primeiro para sabermos quem está levando o item! 😊");
-                return;
-            }
-
-            if (itemValue === "") {
-                alert("Por favor, digite o que você vai levar!");
-                return;
-            }
+            if (!user) { alert("Por favor, clique em 'Confirmar com o Google' primeiro! 😊"); return; }
+            if (itemValue === "") { alert("Por favor, digite o que você vai levar!"); return; }
 
             try {
                 await addDoc(collection(db, "itens_piquenique"), {
-                    uid: user.uid,
-                    nome: user.displayName.split(' ')[0], // Salva só o primeiro nome
-                    item: itemValue,
-                    timestamp: new Date()
+                    uid: user.uid, nome: user.displayName.split(' ')[0], item: itemValue, timestamp: new Date()
                 });
-                itemInput.value = ''; // Limpa o campo de texto
-                console.log("Item salvo!");
-            } catch (error) {
-                console.error("Erro ao salvar item:", error);
-                alert("Erro ao salvar o item: " + error.message);
-            }
+                itemInput.value = ''; 
+            } catch (error) { alert("Erro ao salvar o item: " + error.message); }
         });
 
-        // LER LISTA DE ITENS DO PIQUENIQUE EM TEMPO REAL
+        // LER ITENS EM TEMPO REAL
         const itensQuery = query(collection(db, "itens_piquenique"), orderBy("timestamp", "desc"));
         onSnapshot(itensQuery, (snapshot) => {
             itemsList.innerHTML = ''; 
             snapshot.forEach((doc) => {
                 const data = doc.data();
-                itemsList.innerHTML += `
-                    <li>
-                        <span>${data.item}</span>
-                        <span class="item-author">(${data.nome})</span>
-                    </li>
-                `;
+                itemsList.innerHTML += `<li><span>${data.item}</span><span class="item-author">(${data.nome})</span></li>`;
             });
         });
     </script>
