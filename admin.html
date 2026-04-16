@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin - Aniversário</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #2B0D46;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .admin-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        h2 { color: #5E2C85; text-align: center; margin-bottom: 1.5rem; }
+
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.9rem; }
+        
+        input {
+            width: 100%; padding: 10px; border: 1px solid #ccc;
+            border-radius: 5px; font-family: 'Poppins', sans-serif;
+        }
+
+        .help-text { font-size: 0.75rem; color: #666; display: block; margin-top: 3px; }
+
+        button {
+            width: 100%; padding: 12px; background-color: #5E2C85;
+            color: white; border: none; border-radius: 8px;
+            font-weight: bold; font-size: 1.1rem; cursor: pointer;
+            transition: 0.3s; margin-top: 10px;
+        }
+
+        button:hover { background-color: #2B0D46; }
+        
+        #status-msg { text-align: center; margin-top: 15px; font-weight: bold; color: green; display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="admin-card">
+        <h2>⚙️ Editar Convite</h2>
+        
+        <div class="form-group">
+            <label>Data da Festa:</label>
+            <input type="text" id="admin-data" placeholder="Ex: 10 de maio de 2026">
+        </div>
+
+        <div class="form-group">
+            <label>Horário:</label>
+            <input type="text" id="admin-hora" placeholder="Ex: 08:00h AM">
+        </div>
+
+        <div class="form-group">
+            <label>Nome do Local:</label>
+            <input type="text" id="admin-local" placeholder="Ex: Campo São Bento">
+        </div>
+
+        <div class="form-group">
+            <label>Link do Google Maps (Apenas o link 'src'):</label>
+            <input type="text" id="admin-mapa" placeholder="Cole o link do mapa aqui">
+            <span class="help-text">Ex: http://googleusercontent.com/maps... (Não cole o &lt;iframe&gt; inteiro, só o link que fica dentro do src=" ")</span>
+        </div>
+
+        <button id="btn-salvar">Salvar Alterações</button>
+        <p id="status-msg">Alterações salvas com sucesso!</p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        // MESMA CHAVE DO SITE PRINCIPAL
+        const firebaseConfig = {
+            apiKey: "AIzaSyADD1-3nW7YDKrgX2gDxI-IZliSQ0nKDhI",
+            authDomain: "aniversario20y.firebaseapp.com",
+            projectId: "aniversario20y",
+            storageBucket: "aniversario20y.firebasestorage.app",
+            messagingSenderId: "657674628493",
+            appId: "1:657674628493:web:2a3cb489d2fd933543e1c4"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const configRef = doc(db, "configuracoes", "geral");
+
+        // Elementos da tela
+        const inputData = document.getElementById('admin-data');
+        const inputHora = document.getElementById('admin-hora');
+        const inputLocal = document.getElementById('admin-local');
+        const inputMapa = document.getElementById('admin-mapa');
+        const btnSalvar = document.getElementById('btn-salvar');
+        const statusMsg = document.getElementById('status-msg');
+
+        // 1. Ao abrir o painel, puxa os dados que já existem para preencher os campos
+        async function carregarDadosAtuais() {
+            const docSnap = await getDoc(configRef);
+            if (docSnap.exists()) {
+                const dados = docSnap.data();
+                inputData.value = dados.data || "";
+                inputHora.value = dados.hora || "";
+                inputLocal.value = dados.local || "";
+                inputMapa.value = dados.mapa_url || "";
+            }
+        }
+        carregarDadosAtuais();
+
+        // 2. Ao clicar em Salvar, envia os novos dados pro Firebase
+        btnSalvar.addEventListener('click', async () => {
+            btnSalvar.innerText = "Salvando...";
+            try {
+                await setDoc(configRef, {
+                    data: inputData.value,
+                    hora: inputHora.value,
+                    local: inputLocal.value,
+                    mapa_url: inputMapa.value
+                }, { merge: true }); // Merge true evita apagar campos que não editamos
+
+                btnSalvar.innerText = "Salvar Alterações";
+                statusMsg.style.display = "block";
+                setTimeout(() => statusMsg.style.display = "none", 3000);
+
+            } catch (error) {
+                console.error("Erro ao salvar:", error);
+                alert("Erro: " + error.message);
+                btnSalvar.innerText = "Salvar Alterações";
+            }
+        });
+    </script>
+</body>
+</html>
