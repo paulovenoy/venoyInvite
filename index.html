@@ -51,21 +51,11 @@
 
         .card h2 { font-size: 1.8rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 10px; }
 
-        /* Mapa do Google */
         .map-container {
-            width: 100%;
-            height: 300px;
-            border-radius: 10px;
-            overflow: hidden;
-            margin-top: 1rem;
-            border: 2px solid var(--purple-bg);
-            background-color: #e9ecef;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #6c757d;
+            width: 100%; height: 300px; border-radius: 10px; overflow: hidden;
+            margin-top: 1rem; border: 2px solid var(--purple-bg);
+            background-color: #e9ecef; display: flex; align-items: center; justify-content: center;
         }
-
         .map-container iframe { width: 100%; height: 100%; border: none; }
 
         .quote {
@@ -80,22 +70,12 @@
             padding: 15px 20px; font-size: 1.2rem; font-weight: bold;
             border-radius: 30px; border: none; cursor: pointer; transition: background 0.3s;
         }
-
         .btn:hover { background-color: var(--purple-dark); }
 
-        /* Lista de Convidados */
-        .guests-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-            gap: 15px;
-            margin-top: 1.5rem;
-            text-align: center;
-        }
-
+        .guests-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 15px; margin-top: 1.5rem; text-align: center; }
         .guest-item { display: flex; flex-direction: column; align-items: center; font-size: 0.8rem; font-weight: 600; }
         .guest-item img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 3px solid var(--purple-light); margin-bottom: 5px; }
 
-        /* Seção O que levar */
         .input-group { display: flex; gap: 10px; margin-bottom: 1rem; flex-wrap: wrap; }
         .input-group input { flex: 1; min-width: 200px; padding: 10px; border: 1px solid var(--purple-light); border-radius: 5px; font-family: 'Poppins', sans-serif; }
         .btn-small { background-color: var(--purple-mid); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
@@ -104,7 +84,6 @@
         .items-list li { background: var(--purple-bg); margin-bottom: 8px; padding: 10px; border-radius: 5px; border-left: 3px solid var(--purple-mid); display: flex; justify-content: space-between; align-items: center; }
         .item-author { font-size: 0.8rem; font-weight: bold; color: var(--purple-dark); }
 
-        /* Lista de Presentes */
         .gift-list { list-style: none; margin-left: 10px; }
         .gift-list li { margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
 
@@ -117,28 +96,26 @@
         <div>
             <span class="bougainville">🌺</span><span class="bougainville">🌿</span><span class="bougainville">🌺</span>
         </div>
-        <h1>Meus 20 Anos!</h1>
-        <p>Um piquenique especial entre as florestas de Forks e as Highlands da Escócia.</p>
+        <h1 id="site-titulo">Carregando...</h1>
+        <p id="site-subtitulo">Carregando...</p>
     </header>
 
     <div class="container">
         
         <div class="card">
             <h2>📅 O DNA da Festa 🧬</h2>
-            <p>Nossa biologia nos diz que precisamos de sol, ar livre e boas companhias! Venha celebrar a vida comigo.</p>
+            <p id="site-texto-dna">Carregando mensagem...</p>
             <br>
-            <p><strong>Data:</strong> <span id="site-data">Carregando...</span></p>
-            <p><strong>Hora:</strong> <span id="site-hora">Carregando...</span></p>
-            <p><strong>Local:</strong> <span id="site-local">Carregando...</span></p>
+            <p><strong>Data:</strong> <span id="site-data">...</span></p>
+            <p><strong>Hora:</strong> <span id="site-hora">...</span></p>
+            <p><strong>Local:</strong> <span id="site-local">...</span></p>
             
-            <div class="map-container" id="site-map">
-                Carregando mapa...
-            </div>
+            <div class="map-container" id="site-map">Carregando mapa...</div>
         </div>
 
         <div class="quote">
-            "Sina de cigarra / Djavanear o que há de bom..." 🎵<br>
-            <span style="font-size: 1rem;">- Sina, Djavan</span>
+            "<span id="site-citacao">...</span>" 🎵<br>
+            <span style="font-size: 1rem; font-weight: bold;" id="site-autor">...</span>
         </div>
 
         <div class="card">
@@ -204,20 +181,28 @@
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
 
-        // 1. CARREGAR CONFIGURAÇÕES DO SITE (Editadas no Admin)
+        // CARREGAR DADOS DO FIREBASE E ATUALIZAR O SITE
         const configRef = doc(db, "configuracoes", "geral");
         onSnapshot(configRef, (docSnap) => {
             if (docSnap.exists()) {
                 const config = docSnap.data();
+                
+                document.getElementById('site-titulo').innerText = config.titulo || "Meus 20 Anos!";
+                document.getElementById('site-subtitulo').innerText = config.subtitulo || "Um piquenique especial entre as florestas de Forks e as Highlands da Escócia.";
+                document.getElementById('site-texto-dna').innerText = config.texto_dna || "Nossa biologia nos diz que precisamos de sol, ar livre e boas companhias! Venha celebrar a vida comigo.";
+                document.getElementById('site-citacao').innerText = config.citacao || "Sina de cigarra / Djavanear o que há de bom...";
+                document.getElementById('site-autor').innerText = config.autor || "- Sina, Djavan";
                 document.getElementById('site-data').innerText = config.data || "A definir";
                 document.getElementById('site-hora').innerText = config.hora || "A definir";
                 document.getElementById('site-local').innerText = config.local || "A definir";
                 
                 if (config.mapa_url) {
                     document.getElementById('site-map').innerHTML = `<iframe src="${config.mapa_url}" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`;
-                } else {
-                    document.getElementById('site-map').innerHTML = "Mapa não configurado.";
                 }
+            } else {
+                // Valores padrão se o banco estiver vazio
+                document.getElementById('site-titulo').innerText = "Meus 20 Anos!";
+                document.getElementById('site-subtitulo').innerText = "Um piquenique especial...";
             }
         });
 
@@ -227,12 +212,11 @@
         const addItemBtn = document.getElementById('add-item-btn');
         const itemsList = document.getElementById('items-list');
 
-        // LÓGICA DE LOGIN E PRESENÇA
+        // LÓGICA DE LOGIN
         loginBtn.addEventListener('click', async () => {
             try {
                 const result = await signInWithPopup(auth, provider);
                 const user = result.user;
-
                 const q = query(collection(db, "convidados"), where("uid", "==", user.uid));
                 const querySnapshot = await getDocs(q);
                 
@@ -241,26 +225,18 @@
                         uid: user.uid, nome: user.displayName, foto: user.photoURL, timestamp: new Date()
                     });
                 }
-                
                 loginBtn.innerText = "Presença Confirmada! 🎉";
                 loginBtn.disabled = true;
-
-            } catch (error) {
-                alert("Erro ao salvar no banco: " + error.message);
-            }
+            } catch (error) { alert("Erro ao salvar no banco: " + error.message); }
         });
 
-        // LER LISTA DE CONVIDADOS
+        // LER CONVIDADOS
         onSnapshot(collection(db, "convidados"), (snapshot) => {
             guestsList.innerHTML = ''; 
             snapshot.forEach((doc) => {
                 const convidado = doc.data();
                 const primeiroNome = convidado.nome.split(' ')[0]; 
-                guestsList.innerHTML += `
-                    <div class="guest-item">
-                        <img src="${convidado.foto}" alt="${primeiroNome}" referrerpolicy="no-referrer">
-                        <span>${primeiroNome}</span>
-                    </div>`;
+                guestsList.innerHTML += `<div class="guest-item"><img src="${convidado.foto}" alt="${primeiroNome}" referrerpolicy="no-referrer"><span>${primeiroNome}</span></div>`;
             });
         });
 
@@ -268,21 +244,16 @@
         addItemBtn.addEventListener('click', async () => {
             const user = auth.currentUser;
             const itemValue = itemInput.value.trim();
-
-            if (!user) { alert("Por favor, clique em 'Confirmar com o Google' primeiro! 😊"); return; }
-            if (itemValue === "") { alert("Por favor, digite o que você vai levar!"); return; }
-
+            if (!user) { alert("Confirme sua presença pelo Google primeiro! 😊"); return; }
+            if (itemValue === "") { alert("Digite o que vai levar!"); return; }
             try {
-                await addDoc(collection(db, "itens_piquenique"), {
-                    uid: user.uid, nome: user.displayName.split(' ')[0], item: itemValue, timestamp: new Date()
-                });
+                await addDoc(collection(db, "itens_piquenique"), { uid: user.uid, nome: user.displayName.split(' ')[0], item: itemValue, timestamp: new Date() });
                 itemInput.value = ''; 
             } catch (error) { alert("Erro ao salvar o item: " + error.message); }
         });
 
-        // LER ITENS EM TEMPO REAL
-        const itensQuery = query(collection(db, "itens_piquenique"), orderBy("timestamp", "desc"));
-        onSnapshot(itensQuery, (snapshot) => {
+        // LER ITENS
+        onSnapshot(query(collection(db, "itens_piquenique"), orderBy("timestamp", "desc")), (snapshot) => {
             itemsList.innerHTML = ''; 
             snapshot.forEach((doc) => {
                 const data = doc.data();

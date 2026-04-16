@@ -7,85 +7,111 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #2B0D46;
-            color: #333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-
-        .admin-card {
-            background: white;
-            padding: 2rem;
-            border-radius: 15px;
-            width: 100%;
-            max-width: 500px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
+        body { font-family: 'Poppins', sans-serif; background-color: #2B0D46; color: #333; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        
+        .admin-container { background: white; padding: 2rem; border-radius: 15px; width: 100%; max-width: 800px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         h2 { color: #5E2C85; text-align: center; margin-bottom: 1.5rem; }
 
-        .form-group { margin-bottom: 1rem; }
-        label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.9rem; }
-        
-        input {
-            width: 100%; padding: 10px; border: 1px solid #ccc;
-            border-radius: 5px; font-family: 'Poppins', sans-serif;
-        }
+        /* Abas */
+        .tabs { display: flex; border-bottom: 2px solid #F4EAFB; margin-bottom: 20px; }
+        .tab-btn { flex: 1; padding: 10px; border: none; background: none; font-weight: bold; color: #666; cursor: pointer; transition: 0.3s; }
+        .tab-btn.active { color: #5E2C85; border-bottom: 3px solid #5E2C85; }
+        .tab-btn:hover { background-color: #F4EAFB; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
 
+        /* Formulário */
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.9rem; }
+        input, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-family: 'Poppins', sans-serif; box-sizing: border-box; }
         .help-text { font-size: 0.75rem; color: #666; display: block; margin-top: 3px; }
 
-        button {
-            width: 100%; padding: 12px; background-color: #5E2C85;
-            color: white; border: none; border-radius: 8px;
-            font-weight: bold; font-size: 1.1rem; cursor: pointer;
-            transition: 0.3s; margin-top: 10px;
-        }
-
-        button:hover { background-color: #2B0D46; }
+        button.primary { width: 100%; padding: 12px; background-color: #5E2C85; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        button.primary:hover { background-color: #2B0D46; }
+        button.secondary { background-color: #9B66C5; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 5px; margin-bottom: 15px; }
+        button.secondary:hover { background-color: #5E2C85; }
         
         #status-msg { text-align: center; margin-top: 15px; font-weight: bold; color: green; display: none; }
+
+        /* Listas */
+        .admin-list { list-style: none; padding: 0; margin: 0; }
+        .admin-list li { background: #F4EAFB; padding: 10px 15px; border-radius: 5px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #5E2C85; }
+        .badge { font-size: 0.8rem; background: #5E2C85; color: white; padding: 3px 8px; border-radius: 12px; }
     </style>
 </head>
 <body>
 
-    <div class="admin-card">
-        <h2>⚙️ Editar Convite</h2>
-        
-        <div class="form-group">
-            <label>Data da Festa:</label>
-            <input type="text" id="admin-data" placeholder="Ex: 10 de maio de 2026">
+    <div class="admin-container">
+        <h2>🛠️ Painel de Controle</h2>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('editar')">📝 Editar Site</button>
+            <button class="tab-btn" onclick="showTab('convidados')">👥 Convidados</button>
+            <button class="tab-btn" onclick="showTab('itens')">🧺 O que vão levar</button>
         </div>
 
-        <div class="form-group">
-            <label>Horário:</label>
-            <input type="text" id="admin-hora" placeholder="Ex: 08:00h AM">
+        <div id="editar" class="tab-content active">
+            <div class="form-group">
+                <label>Título Principal:</label>
+                <input type="text" id="admin-titulo" placeholder="Ex: Meus 20 Anos!">
+            </div>
+            <div class="form-group">
+                <label>Subtítulo:</label>
+                <input type="text" id="admin-subtitulo" placeholder="Ex: Um piquenique especial entre as florestas...">
+            </div>
+            <div class="form-group">
+                <label>Texto de Introdução (O DNA da Festa):</label>
+                <textarea id="admin-texto-dna" rows="3" placeholder="Texto chamando a galera..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Frase (Citação):</label>
+                <input type="text" id="admin-citacao" placeholder="Ex: Sina de cigarra / Djavanear o que há de bom...">
+            </div>
+            <div class="form-group">
+                <label>Autor da Frase:</label>
+                <input type="text" id="admin-autor" placeholder="Ex: - Sina, Djavan">
+            </div>
+            <hr style="margin: 20px 0; border: 0; border-top: 1px solid #ccc;">
+            <div class="form-group">
+                <label>Data da Festa:</label>
+                <input type="text" id="admin-data" placeholder="Ex: 10 de maio de 2026">
+            </div>
+            <div class="form-group">
+                <label>Horário:</label>
+                <input type="text" id="admin-hora" placeholder="Ex: 08:00h AM">
+            </div>
+            <div class="form-group">
+                <label>Nome do Local:</label>
+                <input type="text" id="admin-local" placeholder="Ex: Campo São Bento">
+            </div>
+            <div class="form-group">
+                <label>Link do Google Maps (src):</label>
+                <input type="text" id="admin-mapa" placeholder="http://googleusercontent.com/maps...">
+                <span class="help-text">Apenas a URL que fica dentro do src=" " ao incorporar o mapa.</span>
+            </div>
+
+            <button id="btn-salvar" class="primary">Salvar Todas as Alterações</button>
+            <p id="status-msg">Alterações salvas com sucesso!</p>
         </div>
 
-        <div class="form-group">
-            <label>Nome do Local:</label>
-            <input type="text" id="admin-local" placeholder="Ex: Campo São Bento">
+        <div id="convidados" class="tab-content">
+            <button id="btn-copy-guests" class="secondary">📋 Copiar Lista de Convidados</button>
+            <ul id="lista-convidados-admin" class="admin-list">
+                </ul>
         </div>
 
-        <div class="form-group">
-            <label>Link do Google Maps (Apenas o link 'src'):</label>
-            <input type="text" id="admin-mapa" placeholder="Cole o link do mapa aqui">
-            <span class="help-text">Ex: http://googleusercontent.com/maps... (Não cole o &lt;iframe&gt; inteiro, só o link que fica dentro do src=" ")</span>
+        <div id="itens" class="tab-content">
+            <button id="btn-copy-items" class="secondary">📋 Copiar Lista de Alimentos/Itens</button>
+            <ul id="lista-itens-admin" class="admin-list">
+                </ul>
         </div>
 
-        <button id="btn-salvar">Salvar Alterações</button>
-        <p id="status-msg">Alterações salvas com sucesso!</p>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // MESMA CHAVE DO SITE PRINCIPAL
         const firebaseConfig = {
             apiKey: "AIzaSyADD1-3nW7YDKrgX2gDxI-IZliSQ0nKDhI",
             authDomain: "aniversario20y.firebaseapp.com",
@@ -99,47 +125,97 @@
         const db = getFirestore(app);
         const configRef = doc(db, "configuracoes", "geral");
 
-        // Elementos da tela
-        const inputData = document.getElementById('admin-data');
-        const inputHora = document.getElementById('admin-hora');
-        const inputLocal = document.getElementById('admin-local');
-        const inputMapa = document.getElementById('admin-mapa');
+        // Lógica de Abas
+        window.showTab = function(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // ELEMENTOS DO DOM (Inputs)
+        const inputs = {
+            titulo: document.getElementById('admin-titulo'),
+            subtitulo: document.getElementById('admin-subtitulo'),
+            texto_dna: document.getElementById('admin-texto-dna'),
+            citacao: document.getElementById('admin-citacao'),
+            autor: document.getElementById('admin-autor'),
+            data: document.getElementById('admin-data'),
+            hora: document.getElementById('admin-hora'),
+            local: document.getElementById('admin-local'),
+            mapa_url: document.getElementById('admin-mapa')
+        };
         const btnSalvar = document.getElementById('btn-salvar');
         const statusMsg = document.getElementById('status-msg');
 
-        // 1. Ao abrir o painel, puxa os dados que já existem para preencher os campos
+        // VARIÁVEIS PARA ARMAZENAR DADOS PARA CÓPIA
+        let arrayConvidados = [];
+        let arrayItens = [];
+
+        // 1. CARREGAR DADOS DE EDIÇÃO DO SITE
         async function carregarDadosAtuais() {
             const docSnap = await getDoc(configRef);
             if (docSnap.exists()) {
                 const dados = docSnap.data();
-                inputData.value = dados.data || "";
-                inputHora.value = dados.hora || "";
-                inputLocal.value = dados.local || "";
-                inputMapa.value = dados.mapa_url || "";
+                for (let key in inputs) {
+                    if(dados[key]) inputs[key].value = dados[key];
+                }
             }
         }
         carregarDadosAtuais();
 
-        // 2. Ao clicar em Salvar, envia os novos dados pro Firebase
+        // 2. SALVAR DADOS DE EDIÇÃO DO SITE
         btnSalvar.addEventListener('click', async () => {
             btnSalvar.innerText = "Salvando...";
+            const novosDados = {};
+            for (let key in inputs) { novosDados[key] = inputs[key].value; }
+            
             try {
-                await setDoc(configRef, {
-                    data: inputData.value,
-                    hora: inputHora.value,
-                    local: inputLocal.value,
-                    mapa_url: inputMapa.value
-                }, { merge: true }); // Merge true evita apagar campos que não editamos
-
-                btnSalvar.innerText = "Salvar Alterações";
+                await setDoc(configRef, novosDados, { merge: true });
+                btnSalvar.innerText = "Salvar Todas as Alterações";
                 statusMsg.style.display = "block";
                 setTimeout(() => statusMsg.style.display = "none", 3000);
+            } catch (error) { alert("Erro: " + error.message); btnSalvar.innerText = "Salvar Todas as Alterações"; }
+        });
 
-            } catch (error) {
-                console.error("Erro ao salvar:", error);
-                alert("Erro: " + error.message);
-                btnSalvar.innerText = "Salvar Alterações";
-            }
+        // 3. CARREGAR CONVIDADOS (Tempo Real)
+        onSnapshot(collection(db, "convidados"), (snapshot) => {
+            const listaEl = document.getElementById('lista-convidados-admin');
+            listaEl.innerHTML = '';
+            arrayConvidados = [];
+            
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                arrayConvidados.push(data.nome);
+                listaEl.innerHTML += `<li><strong>${data.nome}</strong></li>`;
+            });
+            document.getElementById('btn-copy-guests').innerText = `📋 Copiar Lista (${arrayConvidados.length} Confirmados)`;
+        });
+
+        // 4. CARREGAR ITENS DO PIQUENIQUE (Tempo Real)
+        onSnapshot(query(collection(db, "itens_piquenique"), orderBy("timestamp", "desc")), (snapshot) => {
+            const listaEl = document.getElementById('lista-itens-admin');
+            listaEl.innerHTML = '';
+            arrayItens = [];
+
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                arrayItens.push(`${data.item} (levado por ${data.nome})`);
+                listaEl.innerHTML += `<li><span>${data.item}</span> <span class="badge">${data.nome}</span></li>`;
+            });
+        });
+
+        // 5. FUNÇÕES DE COPIAR
+        document.getElementById('btn-copy-guests').addEventListener('click', () => {
+            if(arrayConvidados.length === 0) { alert("Nenhum convidado ainda!"); return; }
+            const texto = "✅ *LISTA DE CONVIDADOS:*\n" + arrayConvidados.map(c => `- ${c}`).join('\n');
+            navigator.clipboard.writeText(texto).then(() => alert("Lista de Convidados Copiada!"));
+        });
+
+        document.getElementById('btn-copy-items').addEventListener('click', () => {
+            if(arrayItens.length === 0) { alert("Nenhum item ainda!"); return; }
+            const texto = "🧺 *O QUE VAMOS TER NO PIQUENIQUE:*\n" + arrayItens.map(i => `- ${i}`).join('\n');
+            navigator.clipboard.writeText(texto).then(() => alert("Lista de Itens Copiada!"));
         });
     </script>
 </body>
