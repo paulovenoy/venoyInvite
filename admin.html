@@ -4,17 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel Admin - Aniversário</title>
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💜</text></svg>">
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Lora:ital@1&display=swap');
 
-        body { font-family: 'Poppins', sans-serif; background-color: #2B0D46; color: #333; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        body { font-family: 'Poppins', sans-serif; background-color: #2B0D46; color: #333; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
         
         .admin-container { background: white; padding: 2rem; border-radius: 15px; width: 100%; max-width: 800px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         h2 { color: #5E2C85; text-align: center; margin-bottom: 1.5rem; }
 
+        /* Estilos da Tela de Enigma */
+        #tela-enigma { max-width: 400px; text-align: center; }
+        .riddle-text { font-family: 'Lora', serif; font-size: 1.2rem; color: #5E2C85; margin-bottom: 1.5rem; font-style: italic; }
+        #erro-enigma { color: red; font-size: 0.85rem; margin-top: 10px; display: none; font-weight: bold; }
+
         /* Abas */
-        .tabs { display: flex; border-bottom: 2px solid #F4EAFB; margin-bottom: 20px; }
-        .tab-btn { flex: 1; padding: 10px; border: none; background: none; font-weight: bold; color: #666; cursor: pointer; transition: 0.3s; }
+        .tabs { display: flex; border-bottom: 2px solid #F4EAFB; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab-btn { flex: 1; padding: 10px; border: none; background: none; font-weight: bold; color: #666; cursor: pointer; transition: 0.3s; min-width: 120px; }
         .tab-btn.active { color: #5E2C85; border-bottom: 3px solid #5E2C85; }
         .tab-btn:hover { background-color: #F4EAFB; }
         .tab-content { display: none; }
@@ -33,15 +41,29 @@
         
         #status-msg { text-align: center; margin-top: 15px; font-weight: bold; color: green; display: none; }
 
-        /* Listas */
+        /* Listas e Botões de Ação */
         .admin-list { list-style: none; padding: 0; margin: 0; }
         .admin-list li { background: #F4EAFB; padding: 10px 15px; border-radius: 5px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #5E2C85; }
-        .badge { font-size: 0.8rem; background: #5E2C85; color: white; padding: 3px 8px; border-radius: 12px; }
+        .badge { font-size: 0.8rem; background: #5E2C85; color: white; padding: 3px 8px; border-radius: 12px; margin-left: 5px; }
+        
+        .action-btns { display: flex; gap: 10px; }
+        .btn-icon { background: none; border: none; cursor: pointer; font-size: 1.2rem; transition: 0.2s; padding: 0; }
+        .btn-icon:hover { transform: scale(1.2); }
     </style>
 </head>
 <body>
 
-    <div class="admin-container">
+    <div class="admin-container" id="tela-enigma">
+        <h2>🔒 Guardião do Bosque</h2>
+        <p class="riddle-text">"O que o seu amor, mais gosta em você?"</p>
+        <div class="form-group">
+            <input type="password" id="input-enigma" placeholder="Digite a resposta secreta...">
+        </div>
+        <button id="btn-desvendar" class="primary">Desvendar</button>
+        <p id="erro-enigma">Resposta incorreta. Os espíritos da floresta negaram sua entrada!</p>
+    </div>
+
+    <div class="admin-container" id="painel-principal" style="display: none;">
         <h2>🛠️ Painel de Controle</h2>
 
         <div class="tabs">
@@ -96,21 +118,19 @@
 
         <div id="convidados" class="tab-content">
             <button id="btn-copy-guests" class="secondary">📋 Copiar Lista de Convidados</button>
-            <ul id="lista-convidados-admin" class="admin-list">
-                </ul>
+            <ul id="lista-convidados-admin" class="admin-list"></ul>
         </div>
 
         <div id="itens" class="tab-content">
             <button id="btn-copy-items" class="secondary">📋 Copiar Lista de Alimentos/Itens</button>
-            <ul id="lista-itens-admin" class="admin-list">
-                </ul>
+            <ul id="lista-itens-admin" class="admin-list"></ul>
         </div>
 
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, query, orderBy, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyADD1-3nW7YDKrgX2gDxI-IZliSQ0nKDhI",
@@ -125,7 +145,40 @@
         const db = getFirestore(app);
         const configRef = doc(db, "configuracoes", "geral");
 
-        // Lógica de Abas
+        // ==========================================
+        // LÓGICA DO ENIGMA
+        // ==========================================
+        const btnDesvendar = document.getElementById('btn-desvendar');
+        const inputEnigma = document.getElementById('input-enigma');
+        const erroEnigma = document.getElementById('erro-enigma');
+        const telaEnigma = document.getElementById('tela-enigma');
+        const painelPrincipal = document.getElementById('painel-principal');
+
+        function checarEnigma() {
+            // Pega a resposta, tira os espaços em branco e transforma em minúscula
+            const resposta = inputEnigma.value.trim().toLowerCase();
+            
+            if (resposta === "pepeto" || resposta === "pepetos" || resposta === "olhinhos") {
+                telaEnigma.style.display = "none";
+                painelPrincipal.style.display = "block";
+            } else {
+                erroEnigma.style.display = "block";
+            }
+        }
+
+        btnDesvendar.addEventListener('click', checarEnigma);
+        
+        // Permite apertar "Enter" para responder
+        inputEnigma.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                checarEnigma();
+            }
+        });
+
+        // ==========================================
+        // RESTANTE DO CÓDIGO DO PAINEL ADMIN
+        // ==========================================
+
         window.showTab = function(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -133,7 +186,6 @@
             event.target.classList.add('active');
         }
 
-        // ELEMENTOS DO DOM (Inputs)
         const inputs = {
             titulo: document.getElementById('admin-titulo'),
             subtitulo: document.getElementById('admin-subtitulo'),
@@ -148,28 +200,22 @@
         const btnSalvar = document.getElementById('btn-salvar');
         const statusMsg = document.getElementById('status-msg');
 
-        // VARIÁVEIS PARA ARMAZENAR DADOS PARA CÓPIA
         let arrayConvidados = [];
         let arrayItens = [];
 
-        // 1. CARREGAR DADOS DE EDIÇÃO DO SITE
         async function carregarDadosAtuais() {
             const docSnap = await getDoc(configRef);
             if (docSnap.exists()) {
                 const dados = docSnap.data();
-                for (let key in inputs) {
-                    if(dados[key]) inputs[key].value = dados[key];
-                }
+                for (let key in inputs) { if(dados[key]) inputs[key].value = dados[key]; }
             }
         }
         carregarDadosAtuais();
 
-        // 2. SALVAR DADOS DE EDIÇÃO DO SITE
         btnSalvar.addEventListener('click', async () => {
             btnSalvar.innerText = "Salvando...";
             const novosDados = {};
             for (let key in inputs) { novosDados[key] = inputs[key].value; }
-            
             try {
                 await setDoc(configRef, novosDados, { merge: true });
                 btnSalvar.innerText = "Salvar Todas as Alterações";
@@ -178,34 +224,51 @@
             } catch (error) { alert("Erro: " + error.message); btnSalvar.innerText = "Salvar Todas as Alterações"; }
         });
 
-        // 3. CARREGAR CONVIDADOS (Tempo Real)
+        window.deletarConvidado = async (id) => {
+            if(confirm("Tem certeza que deseja remover este convidado da lista?")) {
+                try { await deleteDoc(doc(db, "convidados", id)); } catch (error) { alert("Erro ao deletar: " + error.message); }
+            }
+        };
+
+        window.editarItem = async (id, itemAtual) => {
+            const novoItem = prompt("Editar o nome do item:", itemAtual);
+            if(novoItem !== null && novoItem.trim() !== "" && novoItem !== itemAtual) {
+                try { await updateDoc(doc(db, "itens_piquenique", id), { item: novoItem.trim() }); } catch (error) { alert("Erro ao editar: " + error.message); }
+            }
+        };
+
+        window.deletarItem = async (id) => {
+            if(confirm("Tem certeza que deseja remover este item da mesa do piquenique?")) {
+                try { await deleteDoc(doc(db, "itens_piquenique", id)); } catch (error) { alert("Erro ao deletar: " + error.message); }
+            }
+        };
+
         onSnapshot(collection(db, "convidados"), (snapshot) => {
             const listaEl = document.getElementById('lista-convidados-admin');
             listaEl.innerHTML = '';
             arrayConvidados = [];
-            
-            snapshot.forEach((doc) => {
-                const data = doc.data();
+            snapshot.forEach((documento) => {
+                const data = documento.data();
+                const id = documento.id; 
                 arrayConvidados.push(data.nome);
-                listaEl.innerHTML += `<li><strong>${data.nome}</strong></li>`;
+                listaEl.innerHTML += `<li><strong>${data.nome}</strong><div class="action-btns"><button class="btn-icon" onclick="deletarConvidado('${id}')" title="Excluir Convidado">🗑️</button></div></li>`;
             });
             document.getElementById('btn-copy-guests').innerText = `📋 Copiar Lista (${arrayConvidados.length} Confirmados)`;
         });
 
-        // 4. CARREGAR ITENS DO PIQUENIQUE (Tempo Real)
         onSnapshot(query(collection(db, "itens_piquenique"), orderBy("timestamp", "desc")), (snapshot) => {
             const listaEl = document.getElementById('lista-itens-admin');
             listaEl.innerHTML = '';
             arrayItens = [];
-
-            snapshot.forEach((doc) => {
-                const data = doc.data();
+            snapshot.forEach((documento) => {
+                const data = documento.data();
+                const id = documento.id; 
                 arrayItens.push(`${data.item} (levado por ${data.nome})`);
-                listaEl.innerHTML += `<li><span>${data.item}</span> <span class="badge">${data.nome}</span></li>`;
+                const itemSeguro = data.item.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                listaEl.innerHTML += `<li><span>${data.item} <span class="badge">${data.nome}</span></span><div class="action-btns"><button class="btn-icon" onclick="editarItem('${id}', '${itemSeguro}')" title="Editar Item">✏️</button><button class="btn-icon" onclick="deletarItem('${id}')" title="Excluir Item">🗑️</button></div></li>`;
             });
         });
 
-        // 5. FUNÇÕES DE COPIAR
         document.getElementById('btn-copy-guests').addEventListener('click', () => {
             if(arrayConvidados.length === 0) { alert("Nenhum convidado ainda!"); return; }
             const texto = "✅ *LISTA DE CONVIDADOS:*\n" + arrayConvidados.map(c => `- ${c}`).join('\n');
