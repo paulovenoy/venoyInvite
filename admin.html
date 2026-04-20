@@ -70,6 +70,7 @@
             <button class="tab-btn active" onclick="showTab('editar')">📝 Editar Site</button>
             <button class="tab-btn" onclick="showTab('convidados')">👥 Convidados</button>
             <button class="tab-btn" onclick="showTab('itens')">🧺 O que vão levar</button>
+            <button class="tab-btn" onclick="showTab('mensagens')">💌 Mensagens</button>
         </div>
 
         <div id="editar" class="tab-content active">
@@ -126,6 +127,21 @@
             <ul id="lista-itens-admin" class="admin-list"></ul>
         </div>
 
+        <div id="mensagens" class="tab-content">
+            
+            <div id="mensagens-lock" style="text-align: center; padding: 2rem;">
+                <h3 style="color: #5E2C85;">🔒 Cápsula do Tempo Fechada</h3>
+                <p>A curiosidade é grande, mas você só poderá ler as mensagens no dia <strong>10 de maio de 2026</strong>!</p>
+                <div style="font-size: 4rem; margin-top: 20px;">⏳</div>
+            </div>
+
+            <div id="mensagens-open" style="display: none;">
+                <button id="btn-copy-msgs" class="secondary">📋 Copiar Todas as Mensagens</button>
+                <ul id="lista-mensagens-admin" class="admin-list" style="margin-top: 15px;"></ul>
+            </div>
+            
+        </div>
+
     </div>
 
     <script type="module">
@@ -155,9 +171,7 @@
         const painelPrincipal = document.getElementById('painel-principal');
 
         function checarEnigma() {
-            // Pega a resposta, tira os espaços em branco e transforma em minúscula
             const resposta = inputEnigma.value.trim().toLowerCase();
-            
             if (resposta === "pepeto" || resposta === "pepetos" || resposta === "olhinhos") {
                 telaEnigma.style.display = "none";
                 painelPrincipal.style.display = "block";
@@ -167,18 +181,13 @@
         }
 
         btnDesvendar.addEventListener('click', checarEnigma);
-        
-        // Permite apertar "Enter" para responder
         inputEnigma.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                checarEnigma();
-            }
+            if (e.key === 'Enter') checarEnigma();
         });
 
         // ==========================================
-        // RESTANTE DO CÓDIGO DO PAINEL ADMIN
+        // LÓGICA DAS ABAS
         // ==========================================
-
         window.showTab = function(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -186,6 +195,9 @@
             event.target.classList.add('active');
         }
 
+        // ==========================================
+        // EDIÇÃO DO SITE
+        // ==========================================
         const inputs = {
             titulo: document.getElementById('admin-titulo'),
             subtitulo: document.getElementById('admin-subtitulo'),
@@ -199,9 +211,6 @@
         };
         const btnSalvar = document.getElementById('btn-salvar');
         const statusMsg = document.getElementById('status-msg');
-
-        let arrayConvidados = [];
-        let arrayItens = [];
 
         async function carregarDadosAtuais() {
             const docSnap = await getDoc(configRef);
@@ -224,6 +233,12 @@
             } catch (error) { alert("Erro: " + error.message); btnSalvar.innerText = "Salvar Todas as Alterações"; }
         });
 
+        // ==========================================
+        // LISTAGENS (CONVIDADOS E ITENS)
+        // ==========================================
+        let arrayConvidados = [];
+        let arrayItens = [];
+
         window.deletarConvidado = async (id) => {
             if(confirm("Tem certeza que deseja remover este convidado da lista?")) {
                 try { await deleteDoc(doc(db, "convidados", id)); } catch (error) { alert("Erro ao deletar: " + error.message); }
@@ -238,7 +253,7 @@
         };
 
         window.deletarItem = async (id) => {
-            if(confirm("Tem certeza que deseja remover este item da mesa do piquenique?")) {
+            if(confirm("Tem certeza que deseja remover este item da mesa?")) {
                 try { await deleteDoc(doc(db, "itens_piquenique", id)); } catch (error) { alert("Erro ao deletar: " + error.message); }
             }
         };
@@ -251,7 +266,7 @@
                 const data = documento.data();
                 const id = documento.id; 
                 arrayConvidados.push(data.nome);
-                listaEl.innerHTML += `<li><strong>${data.nome}</strong><div class="action-btns"><button class="btn-icon" onclick="deletarConvidado('${id}')" title="Excluir Convidado">🗑️</button></div></li>`;
+                listaEl.innerHTML += `<li><strong>${data.nome}</strong><div class="action-btns"><button class="btn-icon" onclick="deletarConvidado('${id}')" title="Excluir">🗑️</button></div></li>`;
             });
             document.getElementById('btn-copy-guests').innerText = `📋 Copiar Lista (${arrayConvidados.length} Confirmados)`;
         });
@@ -265,7 +280,7 @@
                 const id = documento.id; 
                 arrayItens.push(`${data.item} (levado por ${data.nome})`);
                 const itemSeguro = data.item.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-                listaEl.innerHTML += `<li><span>${data.item} <span class="badge">${data.nome}</span></span><div class="action-btns"><button class="btn-icon" onclick="editarItem('${id}', '${itemSeguro}')" title="Editar Item">✏️</button><button class="btn-icon" onclick="deletarItem('${id}')" title="Excluir Item">🗑️</button></div></li>`;
+                listaEl.innerHTML += `<li><span>${data.item} <span class="badge">${data.nome}</span></span><div class="action-btns"><button class="btn-icon" onclick="editarItem('${id}', '${itemSeguro}')" title="Editar">✏️</button><button class="btn-icon" onclick="deletarItem('${id}')" title="Excluir">🗑️</button></div></li>`;
             });
         });
 
@@ -280,6 +295,48 @@
             const texto = "🧺 *O QUE VAMOS TER NO PIQUENIQUE:*\n" + arrayItens.map(i => `- ${i}`).join('\n');
             navigator.clipboard.writeText(texto).then(() => alert("Lista de Itens Copiada!"));
         });
+
+        // ==========================================
+        // LÓGICA DAS MENSAGENS (CÁPSULA DO TEMPO)
+        // ==========================================
+        let arrayMensagens = [];
+        const lockScreen = document.getElementById('mensagens-lock');
+        const openScreen = document.getElementById('mensagens-open');
+        
+        // Data de abertura: 10 de maio de 2026 (Os meses em JavaScript vão de 0 a 11, por isso Maio = 4)
+        const dataAbertura = new Date(2026, 4, 10); 
+        const dataAtual = new Date();
+
+        if (dataAtual >= dataAbertura) {
+            // Libera a tela se o dia já chegou!
+            lockScreen.style.display = 'none';
+            openScreen.style.display = 'block';
+
+            onSnapshot(query(collection(db, "mensagens"), orderBy("timestamp", "desc")), (snapshot) => {
+                const listaEl = document.getElementById('lista-mensagens-admin');
+                listaEl.innerHTML = '';
+                arrayMensagens = [];
+                
+                snapshot.forEach((documento) => {
+                    const data = documento.data();
+                    arrayMensagens.push(`De: ${data.nome}\nMensagem: "${data.mensagem}"`);
+                    
+                    listaEl.innerHTML += `
+                        <li style="flex-direction: column; align-items: flex-start;">
+                            <span class="badge" style="margin-bottom: 8px; margin-left: 0; font-size: 0.9rem;">De: ${data.nome}</span>
+                            <p style="margin: 0; font-style: italic; color: #2c3e50;">"${data.mensagem}"</p>
+                        </li>
+                    `;
+                });
+            });
+        }
+
+        document.getElementById('btn-copy-msgs').addEventListener('click', () => {
+            if(arrayMensagens.length === 0) { alert("Nenhuma mensagem ainda!"); return; }
+            const texto = "💌 *MENSAGENS DO PIQUENIQUE (Cápsula do Tempo):*\n\n" + arrayMensagens.join('\n\n---\n\n');
+            navigator.clipboard.writeText(texto).then(() => alert("Mensagens Copiadas com sucesso!"));
+        });
+
     </script>
 </body>
 </html>

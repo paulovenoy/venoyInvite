@@ -67,19 +67,22 @@
         }
 
         .btn {
-            display: block; width: 100%; max-width: 350px; margin: 2rem auto;
+            display: block; width: 100%; max-width: 350px; margin: 1rem auto;
             background-color: var(--purple-mid); color: white; text-align: center;
             padding: 15px 20px; font-size: 1.2rem; font-weight: bold;
             border-radius: 30px; border: none; cursor: pointer; transition: background 0.3s;
         }
         .btn:hover { background-color: var(--purple-dark); }
+        
+        .btn-google { background-color: white; color: var(--text-color); border: 2px solid var(--purple-mid); font-size: 1rem; }
+        .btn-google:hover { background-color: #f1f1f1; }
 
-        .guests-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 15px; margin-top: 1.5rem; text-align: center; }
+        .guests-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 15px; margin-top: 2rem; text-align: center; }
         .guest-item { display: flex; flex-direction: column; align-items: center; font-size: 0.8rem; font-weight: 600; }
         .guest-item img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 3px solid var(--purple-light); margin-bottom: 5px; }
 
         .input-group { display: flex; gap: 10px; margin-bottom: 1rem; flex-wrap: wrap; }
-        .input-group input { flex: 1; min-width: 200px; padding: 10px; border: 1px solid var(--purple-light); border-radius: 5px; font-family: 'Poppins', sans-serif; }
+        .input-group input, .input-group textarea { flex: 1; min-width: 200px; padding: 10px; border: 1px solid var(--purple-light); border-radius: 5px; font-family: 'Poppins', sans-serif; }
         .btn-small { background-color: var(--purple-mid); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
         .btn-small:hover { background-color: var(--purple-dark); }
         .items-list { list-style: none; margin-top: 1rem; }
@@ -133,8 +136,20 @@
 
         <div class="card" id="rsvp-section">
             <h2>✅ Quem vai?</h2>
-            <p>Faça login com sua conta do Google para confirmar sua presença no piquenique!</p>
-            <button id="login-btn" class="btn">Confirmar com o Google</button>
+            <p>Confirme sua presença! Digite seu nome abaixo ou use sua conta do Google.</p>
+            
+            <div class="input-group" style="margin-top: 15px;">
+                <input type="text" id="guest-name-input" placeholder="Digite seu nome e sobrenome..." style="border-radius: 30px;">
+                <button id="btn-nome" class="btn-small" style="border-radius: 30px;">Confirmar</button>
+            </div>
+
+            <p style="text-align: center; font-size: 0.9rem; color: #666; margin: 10px 0;">ou</p>
+
+            <button id="login-btn" class="btn btn-google">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google" style="width: 20px; vertical-align: middle; margin-right: 8px;">
+                Confirmar com o Google
+            </button>
+
             <div id="guests-list" class="guests-grid"></div>
         </div>
 
@@ -146,6 +161,22 @@
                 <button id="add-item-btn" class="btn-small">Adicionar à mesa</button>
             </div>
             <ul id="items-list" class="items-list"></ul>
+        </div>
+
+        <div class="card">
+            <h2>💌 Cápsula do Tempo</h2>
+            <p>Deixe um recadinho especial para mim! Essa caixa de mensagens está magicamente trancada e eu só vou conseguir ler no dia <strong>10 de maio de 2026</strong>.</p>
+            
+            <div class="input-group" style="margin-top: 15px;">
+                <textarea id="msg-input" rows="4" placeholder="Escreva sua mensagem aqui..."></textarea>
+            </div>
+            
+            <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+                <input type="checkbox" id="msg-anonimo" style="width: auto;">
+                <label for="msg-anonimo" style="font-size: 0.9rem; cursor: pointer;">Enviar anonimamente 🕵️‍♀️</label>
+            </div>
+            
+            <button id="send-msg-btn" class="btn-small">Guardar Mensagem 🔒</button>
         </div>
 
         <div class="card">
@@ -190,12 +221,11 @@
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
 
-        // CARREGAR DADOS DO FIREBASE E ATUALIZAR O SITE
+        // CARREGAR DADOS DO FIREBASE
         const configRef = doc(db, "configuracoes", "geral");
         onSnapshot(configRef, (docSnap) => {
             if (docSnap.exists()) {
                 const config = docSnap.data();
-                
                 document.getElementById('site-titulo').innerText = config.titulo || "Meus 20 Anos!";
                 document.getElementById('site-subtitulo').innerText = config.subtitulo || "Um piquenique especial entre as florestas de Forks e as Highlands da Escócia.";
                 document.getElementById('site-texto-dna').innerText = config.texto_dna || "Nossa biologia nos diz que precisamos de sol, ar livre e boas companhias! Venha celebrar a vida comigo.";
@@ -204,42 +234,73 @@
                 document.getElementById('site-data').innerText = config.data || "A definir";
                 document.getElementById('site-hora').innerText = config.hora || "A definir";
                 document.getElementById('site-local').innerText = config.local || "A definir";
-                
                 if (config.mapa_url) {
                     document.getElementById('site-map').innerHTML = `<iframe src="${config.mapa_url}" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`;
                 }
             } else {
-                // Valores padrão se o banco estiver vazio
                 document.getElementById('site-titulo').innerText = "Meus 20 Anos!";
                 document.getElementById('site-subtitulo').innerText = "Um piquenique especial...";
             }
         });
 
+        // ==========================================
+        // LÓGICA DE CONFIRMAR PRESENÇA
+        // ==========================================
         const loginBtn = document.getElementById('login-btn');
+        const btnNome = document.getElementById('btn-nome');
+        const guestNameInput = document.getElementById('guest-name-input');
         const guestsList = document.getElementById('guests-list');
-        const itemInput = document.getElementById('item-input');
-        const addItemBtn = document.getElementById('add-item-btn');
-        const itemsList = document.getElementById('items-list');
-
-        // LÓGICA DE LOGIN
+        
+        // 1. CONFIRMAR COM GOOGLE
         loginBtn.addEventListener('click', async () => {
             try {
                 const result = await signInWithPopup(auth, provider);
                 const user = result.user;
                 const q = query(collection(db, "convidados"), where("uid", "==", user.uid));
                 const querySnapshot = await getDocs(q);
-                
                 if(querySnapshot.empty) {
-                    await addDoc(collection(db, "convidados"), {
-                        uid: user.uid, nome: user.displayName, foto: user.photoURL, timestamp: new Date()
-                    });
+                    await addDoc(collection(db, "convidados"), { uid: user.uid, nome: user.displayName, foto: user.photoURL, timestamp: new Date() });
                 }
                 loginBtn.innerText = "Presença Confirmada! 🎉";
                 loginBtn.disabled = true;
+                btnNome.disabled = true;
+                guestNameInput.disabled = true;
             } catch (error) { alert("Erro ao salvar no banco: " + error.message); }
         });
 
-        // LER CONVIDADOS
+        // 2. CONFIRMAR APENAS COM O NOME
+        btnNome.addEventListener('click', async () => {
+            const nomeValue = guestNameInput.value.trim();
+            if (nomeValue === "") {
+                alert("Por favor, digite seu nome para confirmar!");
+                return;
+            }
+
+            try {
+                // Salva o nome na memória do celular para permitir adicionar itens depois
+                localStorage.setItem('guestName', nomeValue);
+
+                // Cria uma foto de perfil automática com a inicial (fundo roxo, texto branco)
+                const fotoGerada = `https://ui-avatars.com/api/?name=${encodeURIComponent(nomeValue)}&background=9B66C5&color=fff&bold=true`;
+
+                await addDoc(collection(db, "convidados"), {
+                    uid: "local-" + Date.now(), // Cria um ID falso pro firebase não dar erro
+                    nome: nomeValue,
+                    foto: fotoGerada,
+                    timestamp: new Date()
+                });
+
+                guestNameInput.value = '';
+                guestNameInput.placeholder = "Presença Confirmada! 🎉";
+                guestNameInput.disabled = true;
+                btnNome.disabled = true;
+                btnNome.style.backgroundColor = "#2B0D46";
+                loginBtn.disabled = true;
+
+            } catch (error) { alert("Erro ao salvar: " + error.message); }
+        });
+
+        // LER CONVIDADOS NA TELA
         onSnapshot(collection(db, "convidados"), (snapshot) => {
             guestsList.innerHTML = ''; 
             snapshot.forEach((doc) => {
@@ -249,19 +310,30 @@
             });
         });
 
+        // ==========================================
         // LÓGICA DE ITENS
+        // ==========================================
+        const itemInput = document.getElementById('item-input');
+        const addItemBtn = document.getElementById('add-item-btn');
+        const itemsList = document.getElementById('items-list');
+
         addItemBtn.addEventListener('click', async () => {
             const user = auth.currentUser;
+            const localName = localStorage.getItem('guestName'); // Pega o nome se ele tiver usado a opção sem Google
             const itemValue = itemInput.value.trim();
-            if (!user) { alert("Confirme sua presença pelo Google primeiro! 😊"); return; }
+
+            if (!user && !localName) { alert("Confirme sua presença ali em cima primeiro (com Google ou digitando seu nome)! 😊"); return; }
             if (itemValue === "") { alert("Digite o que vai levar!"); return; }
+
+            const nomeRemetente = user ? user.displayName.split(' ')[0] : localName.split(' ')[0];
+            const uidRemetente = user ? user.uid : "local-user";
+
             try {
-                await addDoc(collection(db, "itens_piquenique"), { uid: user.uid, nome: user.displayName.split(' ')[0], item: itemValue, timestamp: new Date() });
+                await addDoc(collection(db, "itens_piquenique"), { uid: uidRemetente, nome: nomeRemetente, item: itemValue, timestamp: new Date() });
                 itemInput.value = ''; 
             } catch (error) { alert("Erro ao salvar o item: " + error.message); }
         });
 
-        // LER ITENS
         onSnapshot(query(collection(db, "itens_piquenique"), orderBy("timestamp", "desc")), (snapshot) => {
             itemsList.innerHTML = ''; 
             snapshot.forEach((doc) => {
@@ -269,6 +341,49 @@
                 itemsList.innerHTML += `<li><span>${data.item}</span><span class="item-author">(${data.nome})</span></li>`;
             });
         });
+
+        // ==========================================
+        // LÓGICA DE MENSAGENS (CÁPSULA DO TEMPO)
+        // ==========================================
+        const msgInput = document.getElementById('msg-input');
+        const msgAnonimo = document.getElementById('msg-anonimo');
+        const sendMsgBtn = document.getElementById('send-msg-btn');
+
+        sendMsgBtn.addEventListener('click', async () => {
+            const texto = msgInput.value.trim();
+            const isAnonimo = msgAnonimo.checked;
+            const user = auth.currentUser;
+            const localName = localStorage.getItem('guestName');
+
+            if (texto === "") {
+                alert("Escreva uma mensagem antes de enviar!");
+                return;
+            }
+
+            let nomeRemetente = "Anônimo";
+            
+            if (!isAnonimo) {
+                if (!user && !localName) {
+                    alert("Para enviar com seu nome, confirme sua presença lá em cima primeiro! Ou marque a caixa 'Enviar anonimamente'. 😊");
+                    return;
+                }
+                nomeRemetente = user ? user.displayName : localName;
+            }
+
+            try {
+                await addDoc(collection(db, "mensagens"), {
+                    nome: nomeRemetente,
+                    mensagem: texto,
+                    timestamp: new Date()
+                });
+                msgInput.value = '';
+                msgAnonimo.checked = false;
+                alert("Sua mensagem foi trancada na Cápsula do Tempo! 💜 A aniversariante só poderá ler no dia 10 de maio.");
+            } catch (error) {
+                alert("Erro ao enviar mensagem: " + error.message);
+            }
+        });
+
     </script>
 </body>
 </html>
