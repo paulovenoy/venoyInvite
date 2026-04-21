@@ -8,10 +8,29 @@ Um convite digital interativo e personalizado para uma celebração de 20 anos. 
 
 ---
 
-## 📸 Visual do Projeto
+## 📸 Preview do Projeto
 
-*(Substitua o link abaixo pela imagem real do seu site)*
-![Visual do Site](https://via.placeholder.com/800x400/5E2C85/FFFFFF?text=Coloque+a+imagem+do+site+aqui)
+### 💜 Visão do Convidado (Site Principal)
+Aqui é onde a mágica acontece! O site interativo onde os convidados confirmam presença, escolhem o que levar e deixam mensagens.
+
+![Página Principal](/preview/inicial.jpg)
+
+---
+
+### 🛠️ Visão da Aniversariante (Painel de Controlo)
+O sistema de gestão completo para organizar a festa com facilidade e em tempo real.
+
+**📝 Edição do Site (Sem tocar em código)**
+![Editar Site](/preview/admin-inicial.png)
+
+**👥 Gestão de Convidados Confirmados**
+![Lista de Convidados](/preview/admin-convidados.png)
+
+**🧺 Gestão da Mesa do Piquenique**
+![O que vão levar](/preview/admin-lista.png)
+
+**💌 Cápsula do Tempo (Magicamente Trancada!)**
+![Cápsula Bloqueada](/preview/admin-mensagem.png)
 
 ---
 
@@ -25,13 +44,13 @@ Um convite digital interativo e personalizado para uma celebração de 20 anos. 
 - **💌 Cápsula do Tempo:** Um sistema de envio de mensagens (anônimas ou identificadas) que ficam trancadas para a aniversariante até o dia da festa.
 - **🎁 Sugestões de Presentes:** Guia visual com os temas favoritos da aniversariante.
 
-### 🛠️ Painel de Controle (Visão Admin)
+### 🛠️ Painel de Controlo (Visão Admin)
 - **🔐 Guardião do Bosque:** Acesso protegido por um enigma temático.
 - **📝 Editor CMS:** Permite alterar os textos principais, data, hora e link do mapa sem precisar tocar no código.
 - **👥 Gestão de Convidados:** Lista de quem confirmou presença com opção de excluir nomes.
 - **📋 Gestão da Mesa:** Edição e exclusão de itens adicionados na lista do piquenique.
-- **⌛ Leitor da Cápsula:** Tela bloqueada por data que só revela as mensagens no dia exato do aniversário.
-- **📤 Exportação:** Botões rápidos para copiar as listas prontas direto para o WhatsApp.
+- **⌛ Leitor da Cápsula:** Ecrã bloqueado por data que só revela as mensagens no dia exato do aniversário.
+- **📤 Exportação:** Botões rápidos para copiar as listas prontas direto para as suas mensagens.
 
 ---
 
@@ -43,13 +62,13 @@ Um convite digital interativo e personalizado para uma celebração de 20 anos. 
 
 ---
 
-## 🔑 Como copiar as Credenciais do Firebase
+## 🔑 Como configurar as Credenciais do Firebase
 
-Para que o banco de dados funcione, você precisa conectar o seu projeto do Firebase. Siga os passos:
+Para que o banco de dados funcione, é necessário conectar o projeto ao Firebase:
 
-1. Acesse o [Firebase Console](https://console.firebase.google.com/) e crie um novo projeto.
+1. Aceda ao [Firebase Console](https://console.firebase.google.com/) e crie um novo projeto.
 2. No menu lateral, ative o **Firestore Database** (crie em Modo de Teste) e o **Authentication** (habilite o provedor do Google).
-3. Na página inicial do seu projeto no Firebase, clique no ícone Web (`</>`) para registrar um aplicativo.
+3. Na página inicial do seu projeto no Firebase, clique no ícone Web (`</>`) para registar uma aplicação.
 4. O Firebase vai gerar um bloco de código parecido com este:
    ```javascript
    const firebaseConfig = {
@@ -60,3 +79,25 @@ Para que o banco de dados funcione, você precisa conectar o seu projeto do Fire
        messagingSenderId: "SEU_SENDER_ID",
        appId: "SEU_APP_ID"
    };
+
+5. Copie apenas o que está dentro das chavetas { ... } e substitua a variável firebaseConfig que se encontra no final dos seus ficheiros index.html e admin.html.
+
+🎨 Temas e Inspirações
+Este projeto foi desenhado à medida, refletindo a personalidade e os gostos da aniversariante. A identidade visual e as funcionalidades foram inspiradas em:
+
+Cores e Flores: Domínio absoluto de tons Roxos (do lilás ao escuro) e a beleza da flor Bougainville 🌺.
+
+Vibe Cinematográfica: O espírito livre e os ventos das Highlands escocesas de Valente 🏹, misturados com o clima misterioso e acolhedor de fim de tarde das florestas de Forks em Crepúsculo 🌲.
+
+Música: A poesia de Djavan, especificamente a música "Sina" 🎵.
+
+Paixões Pessoais: O amor pela Biologia 🧬 e o aconchego dos Gatinhos 🐈.
+
+Fé e Devoção: A bênção e inspiração na natureza de São Francisco de Assis, com um espaço especial para itens católicos 🕊️.
+
+✒️ Créditos
+Este site foi idealizado, desenhado e desenvolvido com muito carinho para criar memórias inesquecíveis.
+
+Feito com ❤️ por Venoy Studio
+
+Venoy Studio • Agência de Desenvolvimento 💚
